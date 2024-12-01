@@ -1,0 +1,840 @@
+Q4
+# Write a program to do: A dataset collected in a cosmetics shop showing
+# details of customers and whether or not they responded to a special offer
+# to buy a new lip-stick is shown in table below. (Implement step by step
+# using commands - Dont use library) Use this dataset to build a decision
+# tree, with Buys as the target variable, to help in buying lipsticks in the
+# future. Find the root node of the decision tree.
+
+import pandas as pd
+import numpy as np
+from pprint import pprint
+
+# Load the dataset
+file_path = 'Lipstick.csv'
+data = pd.read_csv(file_path)
+
+# Display the dataset
+# print(data.head())
+
+def calculate_entropy(target):
+    values, counts = np.unique(target, return_counts=True)
+    probabilities = counts / counts.sum()
+    entropy = -np.sum(probabilities * np.log2(probabilities))
+    return entropy
+
+def calculate_information_gain(data, target, attribute):
+    parent_entropy = calculate_entropy(data[target])
+    values, counts = np.unique(data[attribute], return_counts=True)
+    weighted_entropy = 0
+    for i, value in enumerate(values):
+        subset = data[data[attribute] == value]
+        weighted_entropy += (counts[i] / counts.sum()) * calculate_entropy(subset[target])
+    info_gain = parent_entropy - weighted_entropy
+    return info_gain
+
+def build_decision_tree(data, target, attributes, depth=0):
+    # Base case: If all target values are the same, return the value
+    if len(np.unique(data[target])) == 1:
+        return np.unique(data[target])[0]
+
+    # Base case: If no attributes remain, return the majority target value
+    if not attributes:
+        return data[target].mode()[0]
+
+    # Find the attribute with the highest information gain
+    info_gains = {attr: calculate_information_gain(data, target, attr) for attr in attributes}
+    best_attribute = max(info_gains, key=info_gains.get)
+
+    # Create the tree node
+    tree = {best_attribute: {}}
+
+    # print(info_gains)
+
+    # Split the data on the best attribute and recurse
+    for value in np.unique(data[best_attribute]):
+        subset = data[data[best_attribute] == value]
+        if subset.empty:
+            # If subset is empty, use the majority target value
+            tree[best_attribute][value] = data[target].mode()[0]
+        else:
+            print(subset)
+            # print("best attribute = " + str(best_attribute))
+            remaining_attributes = [attr for attr in attributes if attr != best_attribute]
+            # print(f"remaining_attributes : {remaining_attributes} \n")
+            tree[best_attribute][value] = build_decision_tree(
+                subset, target, remaining_attributes, depth + 1
+            )
+
+    return tree
+
+
+def predict(tree, sample):
+    """
+    Predicts the target value for a single sample using the decision tree.
+
+    Parameters:
+    - tree: The decision tree (a nested dictionary)
+    - sample: A pandas Series representing a single data point
+
+    Returns:
+    - The predicted target value
+    """
+    # Base case: If the tree is a leaf node (a class label)
+    if not isinstance(tree, dict):
+        return tree
+
+    # Otherwise, get the attribute to split on
+    attribute = next(iter(tree))
+    value = sample[attribute]
+
+    # Follow the branch for the attribute's value
+    if value in tree[attribute]:
+        return predict(tree[attribute][value], sample)
+    else:
+        # If the value is not present in the tree, use a default strategy (e.g., majority class)
+        return "Unknown"
+
+
+# Define target variable and attributes
+target = 'Buys'
+attributes = [col for col in data.columns if col not in ['Id', target]]
+# print(attributes)
+
+# Build the decision tree
+decision_tree = build_decision_tree(data, target, attributes)
+
+# Display the decision tree
+pprint(decision_tree)
+
+
+# Example: Predict for a single sample
+# test_data = data.iloc[6]  # Taking the first row of the dataset as an example
+# print(type(sample))
+
+test_data = {
+    'Age': '<21',
+    'Income': 'Low',
+    'Gender': 'Female',
+    'Marital Status': 'Married'
+}
+
+predicted = predict(decision_tree, test_data)
+print(f"Predicted value for the sample: {predicted}")
+
+
+# Calculate information gain for each attribute
+info_gains = {attr: calculate_information_gain(data, target, attr) for attr in attributes}
+
+# Find the root node
+root_node = max(info_gains, key=info_gains.get)
+
+print(f"Root Node: {root_node}")
+
+APPLICATION
+
+1. Targeted Marketing Campaigns
+Customer Segmentation: The decision tree can classify customers based on attributes like age, income, gender, and marital status, helping the cosmetics shop create targeted marketing campaigns for specific customer segments. For example, if the decision tree finds that young, low-income female customers are more likely to respond to a special offer on lipsticks, the store can focus its promotional efforts on that group.
+
+Personalized Offers: Using the decision tree, the shop can predict which customers are more likely to purchase a product (like a new lipstick) when offered a discount or promotion. Based on customer attributes (such as gender or age), the shop can send personalized offers to increase the likelihood of purchase.
+
+
+
+
+---------------------------------------------=========================================================================================================
+
+#5.	Write a program to do: A dataset collected in a cosmetics shop showing details of customers and whether or not they responded to a special offer to buy a new lip-stick is shown in table below. (Use library commands) According to the decision tree you have made from the previous training data set, what is the decision for the test data: [Age < 21, Income = Low, Gender = Female, Marital Status = Married]?
+
+Explanation of Code:
+Dataset Reading:
+python
+Copy code
+df = pd.read_csv(file_path)
+Reads the dataset stored in a CSV file into a pandas DataFrame.
+Encoding Categorical Variables:
+python
+Copy code
+label_encoders = {}
+for column in df.columns:
+    if df[column].dtype == 'object':
+        le = LabelEncoder()
+        df[column] = le.fit_transform(df[column])
+        label_encoders[column] = le
+Converts categorical variables like Age, Income, Gender, etc., into numerical values using LabelEncoder.
+The transformation is necessary for the Decision Tree Classifier, which operates on numerical data.
+Feature and Target Separation:
+python
+Copy code
+X = df.drop(["Buys", "Id"], axis=1)
+y = df["Buys"]
+X represents the features (independent variables), excluding the target column Buys and the irrelevant Id column.
+y is the target variable (dependent variable) we aim to predict.
+Decision Tree Initialization and Training:
+python
+Copy code
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+Initializes the Decision Tree Classifier and trains it on the dataset by fitting it to the features X and the target y.
+Test Data Preparation:
+python
+Copy code
+test_data = pd.DataFrame({
+    "Age": [label_encoders["Age"].transform(["<21"])[0]],
+    "Income": [label_encoders["Income"].transform(["Low"])[0]],
+    "Gender": [label_encoders["Gender"].transform(["Female"])[0]],
+    "Ms": [label_encoders["Ms"].transform(["Married"])[0]]
+})
+Encodes the test data using the same LabelEncoder objects created earlier to ensure consistency with the training data.
+Prediction:
+python
+Copy code
+prediction = clf.predict(test_data)
+predicted_label = label_encoders["Buys"].inverse_transform(prediction)
+Predicts the result (Buys value) for the test data.
+Decodes the predicted numerical value back to its original categorical value using the inverse transform of LabelEncoder.
+Output:
+python
+Copy code
+print(f"The decision for the test data ... is: {predicted_label[0]}")
+Outputs the final decision based on the prediction.
+3. Applications:
+Customer Behavior Analysis:
+Helps businesses predict customer response to promotions or offers.
+Marketing Campaigns:
+Segments customers and tailors strategies based on predictions.
+E-commerce:
+Predicts buying behavior for personalized recommendations.
+Healthcare:
+Predicts patient responses to treatments or health campaigns.
+Let me know if you need clarification or further details!
+==================================================================================================================================================
+
+#6.	Write a program to do: A dataset collected in a cosmetics shop showing details of customers and whether or not they responded to a special offer to buy a new lip-stick is shown in table below. (Use library commands) According to the decision tree you have made from the previous training data set, what is the decision for the test data: [Age > 35, Income = Medium, Gender = Female, Marital Status = Married]?
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+
+# Read the dataset from the CSV file
+file_path = './sample_data/Lipstick.csv'
+df = pd.read_csv(file_path)
+
+# Encode categorical variables into numerical values using LabelEncoder
+label_encoders = {}
+for column in df.columns:
+    if df[column].dtype == 'object':  # if column is categorical
+        le = LabelEncoder()
+        df[column] = le.fit_transform(df[column])
+        label_encoders[column] = le
+
+# Separate features (X) and target (y), and exclude 'Id' column
+X = df.drop(["Buys", "Id"], axis=1)  # Features, excluding 'Id' and 'Buys'
+y = df["Buys"]  # Target variable
+
+# Initialize and train the Decision Tree Classifier
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+
+# Prepare the test data: [Age > 35, Income = Medium, Gender = Female, Marital Status = Married]
+test_data = pd.DataFrame({
+    "Age": [label_encoders["Age"].transform([">35"])[0]],
+    "Income": [label_encoders["Income"].transform(["Medium"])[0]],
+    "Gender": [label_encoders["Gender"].transform(["Female"])[0]],
+    "Ms": [label_encoders["Ms"].transform(["Married"])[0]]
+})
+
+# Predict the result for the test data
+prediction = clf.predict(test_data)
+
+# Decode the prediction back to the original value
+predicted_label = label_encoders["Buys"].inverse_transform(prediction)
+
+# Output the result
+print(f"The decision for the test data [Age > 35, Income = Medium, Gender = Female, Marital Status = Married] is: {predicted_label[0]}")
+
+
+#Short Explanation:
+#Data Preparation:
+#L#oad the dataset from Lipstick.csv using pandas.
+#Use LabelEncoder to convert categorical columns (like Age, Income, Gender, Ms) into numerical values for model compatibility.
+#Training the Decision Tree:
+#Split the dataset into features (input) and the target variable (Buys).
+#Train a Decision Tree Classifier using these features to predict whether a customer buys the lipstick (Yes/No).
+#Predicting for Test Data:
+#Encode the test data (Age > 35, Income = Medium, Gender = Female, Marital Status = Married) into numerical values.
+#Use the trained model to predict the outcome for the test data.
+#Output:
+#Decode the predicted numeric result back to the original (Yes/No) and print the decision.
+ChatGPT said:
+ChatGPT
+Code Explanation
+1. Importing Libraries
+python
+Copy code
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+pandas: For data manipulation and handling the CSV file.
+sklearn.tree.DecisionTreeClassifier: A scikit-learn classifier to build a decision tree.
+sklearn.preprocessing.LabelEncoder: Encodes categorical variables into numeric format.
+2. Reading the Dataset
+python
+Copy code
+file_path = './sample_data/Lipstick.csv'
+df = pd.read_csv(file_path)
+Loads the dataset from a CSV file into a DataFrame named df.
+3. Encoding Categorical Variables
+python
+Copy code
+label_encoders = {}
+for column in df.columns:
+    if df[column].dtype == 'object':  # Check if the column is categorical
+        le = LabelEncoder()
+        df[column] = le.fit_transform(df[column])  # Transform column
+        label_encoders[column] = le  # Store LabelEncoder for decoding
+Purpose: Converts non-numerical (categorical) columns (e.g., Age, Gender, Income) into numerical values.
+fit_transform: Maps each category to a unique integer.
+Example:
+
+Original	Encoded
+>35	2
+<=35	1
+4. Splitting Features and Target
+python
+Copy code
+X = df.drop(["Buys", "Id"], axis=1)  # Features (exclude target 'Buys' and 'Id')
+y = df["Buys"]  # Target variable
+X: Input features for the model (all columns except Buys and Id).
+y: Target column (Buys) to be predicted.
+5. Training the Decision Tree
+python
+Copy code
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+DecisionTreeClassifier: Builds a decision tree model to classify customer responses (Buys).
+fit(): Trains the model using features (X) and target (y).
+6. Preparing the Test Data
+python
+Copy code
+test_data = pd.DataFrame({
+    "Age": [label_encoders["Age"].transform([">35"])[0]],
+    "Income": [label_encoders["Income"].transform(["Medium"])[0]],
+    "Gender": [label_encoders["Gender"].transform(["Female"])[0]],
+    "Ms": [label_encoders["Ms"].transform(["Married"])[0]]
+})
+Test Input: Encodes the test data (Age > 35, Income = Medium, Gender = Female, Marital Status = Married) into numerical format using the stored LabelEncoder objects.
+Example:
+
+Feature	Original Value	Encoded Value
+Age	>35	2
+Income	Medium	1
+Gender	Female	0
+Marital Status	Married	1
+7. Predicting the Outcome
+python
+Copy code
+
+
+prediction = clf.predict(test_data)
+predict(): Uses the trained model to classify the test data.
+8. Decoding the Prediction
+python
+Copy code
+predicted_label = label_encoders["Buys"].inverse_transform(prediction)
+Decodes the predicted numerical output (0 or 1) back to the original categories (Yes or No).
+9. Output the Result
+python
+Copy code
+print(f"The decision for the test data [Age > 35, Income = Medium, Gender = Female, Marital Status = Married] is: {predicted_label[0]}")
+Prints the final decision for the test data.
+Applications
+Customer Behavior Prediction:
+
+Predicts whether a customer is likely to buy a product based on their demographics and preferences.
+Marketing Strategy:
+
+Helps identify target customer segments for personalized offers.
+Automation:
+
+Automates decisions for similar cases in retail, e-commerce, or customer relationship management (CRM) systems.
+
+
+
+=========================================================================================================================================================
+#7 1. Targeted Marketing Campaigns
+Customer Segmentation: The decision tree can classify customers based on attributes like age, income, gender, and marital status, helping the cosmetics shop create targeted marketing campaigns for specific customer segments. For example, if the decision tree finds that young, low-income female customers are more likely to respond to a special offer on lipsticks, the store can focus its promotional efforts on that group.
+
+Personalized Offers: Using the decision tree, the shop can predict which customers are more likely to purchase a product (like a new lipstick) when offered a discount or promotion. Based on customer attributes (such as gender or age), the shop can send personalized offers to increase the likelihood of purchase.
+
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+
+# Load the dataset
+df = pd.read_csv('./sample_data/Lipstick.csv')
+
+# Encode categorical columns into numerical values
+label_encoders = {}
+for col in df.columns:
+    if df[col].dtype == 'object':
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col])
+        label_encoders[col] = le
+
+# Features and target variable
+X = df.drop(["Buys", "Id"], axis=1)
+y = df["Buys"]
+
+# Train the decision tree classifier
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+
+# Test data: [Age > 35, Income = Medium, Gender = Female, Marital Status = Married]
+test_data = pd.DataFrame({
+    "Age": [label_encoders["Age"].transform([">35"])[0]],
+    "Income": [label_encoders["Income"].transform(["Medium"])[0]],
+    "Gender": [label_encoders["Gender"].transform(["Female"])[0]],
+    "Ms": [label_encoders["Ms"].transform(["Married"])[0]]
+})
+
+# Make the prediction
+prediction = clf.predict(test_data)
+
+# Decode the prediction back to the original label
+predicted_label = label_encoders["Buys"].inverse_transform(prediction)
+
+# Output the result
+print(f"Decision for [Age > 35, Income = Medium, Gender = Female, Marital Status = Married]: {predicted_label[0]}")
+ChatGPT said:
+ChatGPT
+Code Explanation:
+Import libraries:
+
+python
+Copy code
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+pandas is imported to work with data in DataFrame format, commonly used for handling datasets.
+DecisionTreeClassifier from sklearn.tree is used to create a decision tree model to classify data.
+LabelEncoder from sklearn.preprocessing is used to convert categorical string labels into numerical values for machine learning algorithms.
+Load the dataset:
+
+python
+Copy code
+df = pd.read_csv('./sample_data/Lipstick.csv')
+Reads a CSV file (Lipstick.csv) from the given path and loads it into a pandas DataFrame (df).
+Encode categorical columns into numerical values:
+
+python
+Copy code
+label_encoders = {}
+for col in df.columns:
+    if df[col].dtype == 'object':
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col])
+        label_encoders[col] = le
+A dictionary label_encoders is initialized to store the LabelEncoder for each categorical column.
+For each column in the DataFrame (df.columns), if the column contains categorical data (identified by dtype == 'object'), it is encoded into numerical values.
+The LabelEncoder transforms each categorical column into integers (e.g., "Female" becomes 0, "Male" becomes 1, etc.).
+The LabelEncoder object for each column is saved in the label_encoders dictionary.
+Define features (X) and target variable (y):
+
+python
+Copy code
+X = df.drop(["Buys", "Id"], axis=1)
+y = df["Buys"]
+X contains the feature columns by dropping the "Buys" and "Id" columns from the DataFrame.
+y is the target variable, which is the "Buys" column, representing whether a customer bought the product or not.
+Train the decision tree classifier:
+
+python
+Copy code
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+A DecisionTreeClassifier object clf is created.
+The clf.fit(X, y) method trains the decision tree model using the features X and the target variable y.
+Prepare test data:
+
+python
+Copy code
+test_data = pd.DataFrame({
+    "Age": [label_encoders["Age"].transform([">35"])[0]],
+    "Income": [label_encoders["Income"].transform(["Medium"])[0]],
+    "Gender": [label_encoders["Gender"].transform(["Female"])[0]],
+    "Ms": [label_encoders["Ms"].transform(["Married"])[0]]
+})
+A DataFrame test_data is created with a sample input where:
+"Age" is ">35",
+"Income" is "Medium",
+"Gender" is "Female",
+"Marital Status (Ms)" is "Married".
+The categorical values are transformed using the LabelEncoder stored earlier to convert the string labels into numerical values (e.g., ">35" to an integer).
+Make a prediction:
+
+python
+Copy code
+prediction = clf.predict(test_data)
+The clf.predict(test_data) method makes a prediction on the test data to determine whether the customer will buy the product or not.
+Decode the prediction back to the original label:
+
+python
+Copy code
+predicted_label = label_encoders["Buys"].inverse_transform(prediction)
+The predicted numerical value is converted back to its original categorical label (e.g., 0 back to "No", 1 back to "Yes") using the inverse transformation of the "Buys" column.
+Output the result:
+
+python
+Copy code
+print(f"Decision for [Age > 35, Income = Medium, Gender = Female, Marital Status = Married]: {predicted_label[0]}")
+The predicted label ("Yes" or "No") is printed to indicate the decision for the test data sample.
+Application:
+This code demonstrates a simple machine learning classification model (Decision Tree) that predicts whether a customer will buy a product based on demographic features such as age, income, gender, and marital status. It performs the following tasks:
+
+Data preprocessing by encoding categorical data.
+Training a decision tree model.
+Making a prediction on new input data.
+Decoding and displaying the predicted result.
+Potential Use Cases:
+Marketing: Businesses can use this model to predict if a customer will buy a product based on demographic information.
+Customer Segmentation: Companies can segment customers based on their likelihood of purchase to tailor marketing campaigns.
+E-commerce: Personalizing product recommendations based on customer data to boost sales.
+
+
+
+===============================================================================================================================================
+
+# 8.	Write a program to do: A dataset collected in a cosmetics shop showing details of customers and whether or not they responded to a special offer to buy a new lip-stick is shown in table below. (Use library commands)
+According to the decision tree you have made from the previous training data set, what is the decision for the test data: [Age = 21-35, Income = Low, Gender = Male, Marital Status = Married]?
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+
+# Load the dataset
+df = pd.read_csv('./sample_data/Lipstick.csv')
+
+# Encode categorical columns into numerical values
+label_encoders = {}
+for col in df.columns:
+    if df[col].dtype == 'object':
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col])
+        label_encoders[col] = le
+
+# Features and target variable
+X = df.drop(["Buys", "Id"], axis=1)
+y = df["Buys"]
+
+# Train the decision tree classifier
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+
+# Test data: [Age = 21-35, Income = Low, Gender = Male, Marital Status = Married]
+test_data = pd.DataFrame({
+    "Age": [label_encoders["Age"].transform(["21-35"])[0]],
+    "Income": [label_encoders["Income"].transform(["Low"])[0]],
+    "Gender": [label_encoders["Gender"].transform(["Male"])[0]],
+    "Ms": [label_encoders["Ms"].transform(["Married"])[0]]
+})
+
+# Make the prediction
+prediction = clf.predict(test_data)
+
+# Decode the prediction back to the original label
+predicted_label = label_encoders["Buys"].inverse_transform(prediction)
+
+# Output the result
+print(f"Decision for [Age = 21-35, Income = Low, Gender = Male, Marital Status = Married]: {predicted_label[0]}")
+
+code 
+explaination of code with each line in brief
+application
+ChatGPT said:
+ChatGPT
+Here's a detailed explanation of the code with each line's purpose:
+
+1. Import necessary libraries:
+python
+Copy code
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+pandas as pd: Imports the pandas library for data manipulation and analysis.
+DecisionTreeClassifier: From sklearn.tree, used for building decision tree models, a supervised learning algorithm.
+LabelEncoder: From sklearn.preprocessing, used to convert categorical labels into numerical format, which is necessary for many machine learning algorithms.
+2. Load the dataset:
+python
+Copy code
+df = pd.read_csv('./sample_data/Lipstick.csv')
+This line reads a CSV file (Lipstick.csv) into a pandas DataFrame (df), which will be used for further processing. The dataset is assumed to contain various features related to customer data and their purchase decisions.
+3. Encode categorical columns into numerical values:
+python
+Copy code
+label_encoders = {}
+for col in df.columns:
+    if df[col].dtype == 'object':
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col])
+        label_encoders[col] = le
+label_encoders = {}: Initializes an empty dictionary to store the label encoders for each column.
+The for loop iterates through all columns in the DataFrame (df.columns).
+if df[col].dtype == 'object': Checks if the column contains categorical (text) data.
+le = LabelEncoder(): Creates a new LabelEncoder instance.
+df[col] = le.fit_transform(df[col]): Transforms the categorical values in the column into numerical values (e.g., "Low" becomes 0, "High" becomes 1, etc.).
+label_encoders[col] = le: Saves the LabelEncoder instance for the column, so that the transformation can be reversed later.
+4. Define features and target variable:
+python
+Copy code
+X = df.drop(["Buys", "Id"], axis=1)
+y = df["Buys"]
+X: Creates a feature matrix by dropping the Buys column (target variable) and the Id column (which is presumably an identifier that doesn't affect the model).
+y: Defines the target variable, which is the Buys column, indicating whether the customer buys the product or not.
+5. Train the decision tree classifier:
+python
+Copy code
+clf = DecisionTreeClassifier()
+clf.fit(X, y)
+clf = DecisionTreeClassifier(): Initializes a decision tree classifier model.
+clf.fit(X, y): Fits the classifier model to the training data (X for features and y for the target variable).
+6. Prepare test data:
+python
+Copy code
+test_data = pd.DataFrame({
+    "Age": [label_encoders["Age"].transform(["21-35"])[0]],
+    "Income": [label_encoders["Income"].transform(["Low"])[0]],
+    "Gender": [label_encoders["Gender"].transform(["Male"])[0]],
+    "Ms": [label_encoders["Ms"].transform(["Married"])[0]]
+})
+This creates a DataFrame (test_data) with a single test record:
+Age: Transformed from the string "21-35" to its numeric encoding.
+Income: Transformed from "Low" to its numeric encoding.
+Gender: Transformed from "Male" to its numeric encoding.
+Ms: Transformed from "Married" to its numeric encoding.
+These transformations are done using the label_encoders dictionary, which maps each column's categorical values to their respective numeric values.
+7. Make the prediction:
+python
+Copy code
+prediction = clf.predict(test_data)
+clf.predict(test_data): Uses the trained decision tree classifier (clf) to make a prediction on the test_data. The model predicts whether the customer in the test data will buy the product or not.
+8. Decode the prediction back to the original label:
+python
+Copy code
+predicted_label = label_encoders["Buys"].inverse_transform(prediction)
+This line decodes the numeric prediction back into the original categorical label (e.g., "Yes" or "No") using the inverse_transform method of the LabelEncoder for the Buys column.
+9. Output the result:
+python
+Copy code
+print(f"Decision for [Age = 21-35, Income = Low, Gender = Male, Marital Status = Married]: {predicted_label[0]}")
+This prints the result of the prediction to the console, showing whether the customer in the test data will buy the product or not.
+Applications:
+This code is used for predicting whether a customer will buy a product based on features such as age, income, gender, and marital status. It can be applied in several real-world scenarios, such as:
+
+Marketing and Sales: Predicting whether a customer is likely to make a purchase, helping businesses target specific customer segments.
+Customer Behavior Analysis: Analyzing customer patterns and predicting future purchases based on historical data.
+Recommendation Systems: Building systems that recommend products to customers based on their demographics and previous buying behavior.
+Retail: Helping retail businesses make data-driven decisions on product placement, stock management, and personalized offers.
+
+===================================================================================================================================================
+
+
+#23.	With reference to Table , obtain the Frequency table for the attribute age. From the frequency table you have obtained, calculate the information gain of the frequency table while splitting on Age. (Use step by step Python/Pandas commands)
+
+import pandas as pd
+import math
+
+# Step 1: Load the data from the provided Excel file
+file_path = './sample_data/Age Table.xlsx'
+df = pd.read_excel(file_path)
+
+# Step 2: Generate the Frequency Table for the Age Attribute
+age_freq = df['Age'].value_counts()
+print("Frequency Table for Age:")
+print(age_freq)
+
+# Step 3: Calculate the Entropy of the Class (Target Variable)
+def calculate_entropy(data):
+    # Count the number of occurrences of each class value
+    total = len(data)
+    counts = data.value_counts()
+    entropy = 0
+    for count in counts:
+        prob = count / total
+        entropy -= prob * math.log2(prob)  # Use log base 2
+    return entropy
+
+# Calculate the entropy of the 'Class' column
+class_entropy = calculate_entropy(df['Class'])
+print(f"Entropy of the Class (Target Variable): {class_entropy}")
+
+# Step 4: Calculate the Entropy After Splitting on the Age Attribute
+def calculate_weighted_entropy(data, feature):
+    feature_values = data[feature].unique()
+    total = len(data)
+    weighted_entropy = 0
+
+    for value in feature_values:
+        subset = data[data[feature] == value]
+        weighted_entropy += (len(subset) / total) * calculate_entropy(subset['Class'])
+
+    return weighted_entropy
+
+# Calculate the entropy after splitting on the 'Age' attribute
+age_split_entropy = calculate_weighted_entropy(df, 'Age')
+print(f"Entropy After Splitting on Age: {age_split_entropy}")
+
+# Step 5: Calculate Information Gain
+information_gain = class_entropy - age_split_entropy
+print(f"Information Gain After Splitting on Age: {information_gain}")
+ChatGPT said:
+ChatGPT
+To calculate the information gain from the given frequency table, I'll guide you step-by-step with the given Python code, breaking down what each part of the code does and how information gain is computed. Below is the explanation of the process:
+
+Step-by-step Breakdown:
+1. Import Libraries:
+python
+Copy code
+import pandas as pd
+import math
+pandas is used for handling and manipulating data (like reading and processing the Excel file).
+math is used for mathematical calculations, specifically for the logarithmic operation to calculate entropy.
+2. Load Data:
+python
+Copy code
+file_path = './sample_data/Age Table.xlsx'
+df = pd.read_excel(file_path)
+This step reads the Excel file at the given path ('./sample_data/Age Table.xlsx') and loads it into a pandas DataFrame (df), which contains the dataset.
+3. Generate Frequency Table for the Age Attribute:
+python
+Copy code
+age_freq = df['Age'].value_counts()
+print("Frequency Table for Age:")
+print(age_freq)
+df['Age'].value_counts() calculates the frequency of each unique value in the Age column. The output is a frequency table, showing how many times each age group appears in the dataset.
+print(age_freq) displays this frequency table.
+4. Calculate the Entropy of the Class (Target Variable):
+python
+Copy code
+def calculate_entropy(data):
+    total = len(data)
+    counts = data.value_counts()
+    entropy = 0
+    for count in counts:
+        prob = count / total
+        entropy -= prob * math.log2(prob)  # Use log base 2
+    return entropy
+
+class_entropy = calculate_entropy(df['Class'])
+print(f"Entropy of the Class (Target Variable): {class_entropy}")
+The calculate_entropy function calculates the entropy of a given dataset (or column).
+
+It first counts how many occurrences there are for each class value (e.g., "Yes" or "No").
+It then calculates the probability of each class and computes the entropy using the formula:
+𝐻
+(
+𝑆
+)
+=
+−
+∑
+𝑖
+=
+1
+𝑛
+𝑝
+𝑖
+log
+⁡
+2
+(
+𝑝
+𝑖
+)
+H(S)=− 
+i=1
+∑
+n
+​
+ p 
+i
+​
+ log 
+2
+​
+ (p 
+i
+​
+ )
+Where p_i is the probability of class i.
+
+class_entropy stores the entropy of the target variable (Class), which represents how mixed the classes are before splitting.
+
+5. Calculate the Entropy After Splitting on the Age Attribute:
+python
+Copy code
+def calculate_weighted_entropy(data, feature):
+    feature_values = data[feature].unique()
+    total = len(data)
+    weighted_entropy = 0
+
+    for value in feature_values:
+        subset = data[data[feature] == value]
+        weighted_entropy += (len(subset) / total) * calculate_entropy(subset['Class'])
+
+    return weighted_entropy
+
+age_split_entropy = calculate_weighted_entropy(df, 'Age')
+print(f"Entropy After Splitting on Age: {age_split_entropy}")
+The calculate_weighted_entropy function calculates the entropy after splitting the dataset based on a given feature (Age in this case).
+It calculates the entropy for each subset of data where Age has a particular value.
+The weighted entropy is computed by taking the entropy of each subset and weighing it by the proportion of instances that belong to that subset (based on len(subset) / total).
+The final weighted entropy (age_split_entropy) represents how mixed the classes are after splitting the dataset based on the Age attribute.
+6. Calculate Information Gain:
+python
+Copy code
+information_gain = class_entropy - age_split_entropy
+print(f"Information Gain After Splitting on Age: {information_gain}")
+Information Gain is calculated as the difference between the entropy of the class before splitting (class_entropy) and the entropy of the class after splitting on the Age attribute (age_split_entropy).
+
+The formula for information gain is:
+𝐼
+𝐺
+(
+𝑆
+,
+Age
+)
+=
+𝐻
+(
+𝑆
+)
+−
+𝐻
+(
+𝑆
+∣
+Age
+)
+IG(S,Age)=H(S)−H(S∣Age)
+Where H(S) is the entropy before the split and H(S | Age) is the weighted entropy after the split on Age.
+
+information_gain is then printed, showing how much uncertainty (entropy) was reduced by using the Age attribute for splitting.
+
+Application in Decision Trees:
+This process is part of the decision tree algorithm's attribute selection procedure.
+Information gain helps the decision tree algorithm decide which feature (e.g., Age) to split on at each node in the tree. A higher information gain indicates that splitting on a feature results in a more "pure" partition (i.e., subsets of data that are more homogeneous in terms of the target class).
+This method can be applied to various datasets to build decision trees that predict target variables (like "Buys" in your earlier example) based on features.
+Python/Pandas Commands Summary:
+df['Age'].value_counts() – Generates the frequency table for the Age column.
+df['Class'].value_counts() – Counts occurrences of each class value for entropy calculation.
+calculate_entropy() – Custom function to calculate entropy for a given data column.
+df[feature].unique() – Finds unique values in the feature column for splitting.
+calculate_weighted_entropy() – Custom function to calculate the weighted entropy after splitting based on a given feature.
+information_gain = class_entropy - age_split_entropy – Computes the information gain after the split.
+By following these steps, you can compute the information gain for any attribute in your dataset and use it for decision tree model construction.
+
+
+
+

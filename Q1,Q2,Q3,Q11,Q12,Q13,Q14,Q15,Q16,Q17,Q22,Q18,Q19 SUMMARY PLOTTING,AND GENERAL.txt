@@ -1,0 +1,971 @@
+       
+# 1. Perform the following operations using Python on a data set : read data
+# from different formats(like csv, xls),indexing and selecting data, sort data,
+# describe attributes of data, checking data types of each column. (Use
+# Titanic Dataset).
+
+import pandas as pd
+
+# read data from different formats(like csv, xls)
+df1 = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/Titanic.csv')
+
+# df2 = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/Titanic.xls')
+
+print(df1.head())
+
+print(df1.sample())
+
+# indexing and selecting data
+print("setting passengerId as index")
+df1.set_index("PassengerId", inplace = True)
+
+print("Selecting a specific column")
+print(df1["Name"].head())
+
+print("selecting rows using loc (label based)")
+print(df1.loc[1:5,["Name","Survived"]])
+
+print("selecting rows using iloc (position based)")
+print(df1.iloc[0:5,0:3])
+
+
+# sort data
+print("sort data")
+sorted_data = df1.sort_values(by="Age",ascending=True)
+print(sorted_data.head())   
+
+# Describing numerical attributes
+print(df1.describe())
+
+# Describing all attributes, including categorical
+print(df1.describe(include='all'))
+
+# Checking dataset structure and memory usage
+print(df1.info())
+
+
+# Displaying data types of all columns
+print(df1.dtypes)
+
+Applications
+Data Preprocessing:
+
+Reading data from various file formats like CSV and Excel.
+Cleaning, sorting, and summarizing data.
+Data Exploration:
+
+Viewing samples, indexing, and selecting specific rows or columns.
+Understanding data through descriptive statistics and summaries.
+Machine Learning Pipelines:
+
+Preparing data for modeling by understanding the structure and types.
+Business Analytics:
+
+Sorting and filtering data to extract meaningful insights, such as understanding Titanic survivors by age or name.
+Educational Use:
+
+Learning Python's capabilities for data analysis.
+--------------------------------------------------------------------------------------------------------------------
+# 2. Perform the following operations using Python on the Telecom_Churn
+# dataset. Compute and display summary statistics for each feature available
+# in the dataset using separate commands for each statistic. (e.g. minimum
+# value, maximum value, mean, range, standard deviation, variance and
+# percentiles).
+
+
+import pandas as pd
+
+# Load the Telecom Churn dataset
+file_path = "C:/Users/DELL/DSML_PRACTICAL/Datasets/Telecom Churn.csv"  # Update the path as needed
+telecom_data = pd.read_csv(file_path)
+
+# Display the first few rows of the dataset
+print("First few rows of the dataset:")
+print(telecom_data.head())
+
+# Summary statistics for each feature
+for column in telecom_data.select_dtypes(include=['number']).columns:
+    print(f"\nStatistics for {column}:")
+    
+    # Minimum value
+    print(f"Minimum: {telecom_data[column].min()}")
+    
+    # Maximum value
+    print(f"Maximum: {telecom_data[column].max()}")
+    
+    # Mean
+    print(f"Mean: {telecom_data[column].mean()}")
+    
+    # Range
+    data_range = telecom_data[column].max() - telecom_data[column].min()
+    print(f"Range: {data_range}")
+    
+    # Standard deviation
+    print(f"Standard Deviation: {telecom_data[column].std()}")
+    
+    # Variance
+    print(f"Variance: {telecom_data[column].var()}")
+    
+    # Percentiles
+    percentiles = telecom_data[column].quantile([0.25, 0.5, 0.75]).to_dict()
+    print(f"25th Percentile: {percentiles[0.25]}")
+    print(f"50th Percentile (Median): {percentiles[0.5]}")
+    print(f"75th Percentile: {percentiles[0.75]}")
+Applications
+Customer Retention Analysis:
+
+Helps telecom companies understand key numerical metrics (e.g., monthly charges, total calls, usage duration) for customer behavior.
+Data Exploration:
+
+Summarizes numerical attributes to understand data distribution, outliers, and variability.
+Business Insights:
+
+Assesses customer churn by analyzing the variance and range of specific metrics such as Total Charges or Monthly Charges.
+Predictive Modeling:
+
+Identifies important data attributes for machine learning algorithms by analyzing spread and central tendency.
+Decision-Making:
+
+Provides a statistical basis for decisions, such as focusing on customers with high variance in charges or usage patterns.
+--------------------------------------------------------------------------------------------------------------------------------------
+
+# 3. Perform the following operations using Python on the data set
+# House_Price Prediction dataset. Compute standard deviation, variance and
+# percentiles using separate commands, for each feature. Create a histogram
+# for each feature in the dataset to illustrate the feature distributions
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+House_Price = pd.read_csv("C:/Users/DELL/DSML_PRACTICAL/Datasets/House Data.csv")
+
+print(House_Price.info())
+
+
+for column in House_Price.select_dtypes(include=['number']).columns:
+    print(f"\nFeature distribution for {column}")
+
+    print(f"Standard Deviation: {House_Price[column].std()}")
+
+    print(f"Variance: {House_Price[column].var()}")
+
+    percentiles = House_Price[column].quantile([0.25,0.5,0.75]).to_dict()
+
+    print(f"25th percentile: {percentiles[0.25]}")
+    print(f"50th percentile: {percentiles[0.5]}")
+    print(f"75th percentile: {percentiles[0.75]}")
+
+
+
+# Create histograms for each numerical feature using Seaborn
+for column in House_Price.select_dtypes(include=['number']).columns:
+    plt.figure(figsize=(8, 6))
+    sns.histplot(House_Price[column])
+    plt.title(f'Histogram of {column}', fontsize=16)
+    plt.xlabel(column, fontsize=14)
+    plt.ylabel('Frequency', fontsize=14)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+
+Code Breakdown
+Importing Libraries
+python
+Copy code
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+Purpose:
+pandas: For data loading and manipulation.
+seaborn: For creating attractive and informative statistical graphics.
+matplotlib.pyplot: For customizing and displaying visualizations.
+Loading the Dataset
+python
+Copy code
+House_Price = pd.read_csv("C:/Users/DELL/DSML_PRACTICAL/Datasets/House Data.csv")
+Purpose: Loads the House Price Prediction dataset into a Pandas DataFrame.
+Inspecting the Dataset
+python
+Copy code
+print(House_Price.info())
+Purpose:
+Displays information about the dataset, such as:
+Number of columns and their names.
+Data types of columns.
+Number of non-null values in each column.
+Calculating Statistics for Each Feature
+Iterating Over Numeric Columns
+python
+Copy code
+for column in House_Price.select_dtypes(include=['number']).columns:
+Purpose: Filters numeric columns (float or int) for analysis.
+Calculating Standard Deviation
+python
+Copy code
+    print(f"Standard Deviation: {House_Price[column].std()}")
+Purpose: Computes the standard deviation of the feature using .std().
+Standard deviation measures the spread of data values around the mean.
+Calculating Variance
+python
+Copy code
+    print(f"Variance: {House_Price[column].var()}")
+Purpose: Computes the variance using .var().
+Variance quantifies the squared deviations of each data point from the mean.
+Calculating Percentiles
+python
+Copy code
+    percentiles = House_Price[column].quantile([0.25,0.5,0.75]).to_dict()
+    print(f"25th percentile: {percentiles[0.25]}")
+    print(f"50th percentile: {percentiles[0.5]}")
+    print(f"75th percentile: {percentiles[0.75]}")
+Purpose:
+Computes the 25th, 50th (median), and 75th percentiles using .quantile().
+Converts the result into a dictionary for easier access and prints the values.
+Percentiles help understand data spread and key distribution points.
+Creating Histograms
+Iterating Over Numeric Columns
+python
+Copy code
+for column in House_Price.select_dtypes(include=['number']).columns:
+    plt.figure(figsize=(8, 6))
+    sns.histplot(House_Price[column])
+    plt.title(f'Histogram of {column}', fontsize=16)
+    plt.xlabel(column, fontsize=14)
+    plt.ylabel('Frequency', fontsize=14)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+Purpose:
+For each numeric column:
+Creates a histogram using sns.histplot().
+Displays data distribution for the feature.
+Customizes the plot:
+Adds a title and axes labels.
+Displays a grid for better readability.
+Uses plt.show() to render each plot separately.
+
+Applications
+Exploratory Data Analysis (EDA):
+
+Helps identify the spread, central tendency, and variability of features.
+Feature Engineering:
+
+Percentile information can guide binning or normalization strategies.
+Standard deviation and variance indicate the level of data variability.
+Data Visualization:
+
+Histograms provide insights into the distribution of features:
+Whether the data is skewed, normally distributed, or has outliers.
+Preprocessing for Machine Learning:
+
+Helps decide if data transformations (e.g., log transformation or scaling) are required.
+This code lays the foundation for understanding the data, enabling further analysis or model-building tasks.
+
+
+Applications
+Data Exploration:
+
+Understanding the spread, variability, and distribution of features like house prices, size, and location impact.
+Outlier Detection:
+
+Spotting unusual values in distributions through histograms.
+Feature Engineering:
+
+Identifying potential transformations for skewed features based on their histograms.
+Model Building:
+
+Ensures numerical features are properly scaled and distributed for machine learning algorithms.
+Business Insights:
+
+Helps real estate companies identify price ranges and trends in the dataset.
+Visualization:
+Provides clear, concise visual summaries of the data for stakeholders.
+----------------------------------------------------------------------------------------------------------------------------------------------
+# Use Iris flower dataset and perform following :
+# 11. List down the features and their types (e.g., numeric, nominal)
+# available in the dataset. 2. Create a histogram for each feature in the
+# dataset to illustrate the feature distributions.
+
+
+import pandas as pd 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/IRIS.csv')
+
+for column in data.columns:
+    dtype = "Numeric" if data[column].dtype in ["float64","int64"] else "Nominal"
+    print(f"{column}: {dtype}")
+
+numeric_features = ["sepal_length","sepal_width","petal_length","petal_width"]
+
+for feature in numeric_features:
+    sns.histplot(data[feature],bins=15,kde=True,color='red')
+    plt.title(f"Histogram of {feature}")
+    plt.xlabel(feature)
+    plt.ylabel("Frequency")
+    plt.show()
+
+Applications
+Exploratory Data Analysis:
+
+Identifies the distributions of numeric features, such as sepal and petal dimensions.
+Data Preprocessing:
+
+Recognizes whether feature distributions require scaling or transformations (e.g., normalization).
+Pattern Recognition:
+
+Understands relationships between features like petal length and width.
+Visualization:
+
+Illustrates feature distributions for reports and presentations.
+Machine Learning:
+
+Prepares insights for feature engineering or clustering tasks based on feature types and distributions.
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+# 12.Use Iris flower dataset and perform following :
+# 1. Create a box plot for each feature in the dataset.
+# 2. Identify and discuss distributions and identify outliers from them.
+
+
+import pandas as pd 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/IRIS.csv')
+
+numeric_features = ["sepal_length","sepal_width","petal_length","petal_width"]
+
+for feature in numeric_features:
+    sns.boxplot(x=data[feature],color="red")
+    plt.title(f"Box plot of {feature}")
+    plt.xlabel(feature)
+    plt.show()
+
+
+Code Breakdown
+Importing Libraries
+python
+Copy code
+import pandas as pd 
+import matplotlib.pyplot as plt
+import seaborn as sns
+Purpose:
+pandas: For data manipulation.
+matplotlib.pyplot: For customizing and displaying visualizations.
+seaborn: For creating advanced statistical plots like box plots.
+Loading the Dataset
+python
+Copy code
+data = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/IRIS.csv')
+Purpose: Loads the Iris dataset into a Pandas DataFrame.
+Defining Numeric Features
+python
+Copy code
+numeric_features = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
+Purpose: Specifies the columns containing numeric data.
+Creating Box Plots
+Iterating Over Numeric Features
+python
+Copy code
+for feature in numeric_features:
+    sns.boxplot(x=data[feature], color="red")
+    plt.title(f"Box plot of {feature}")
+    plt.xlabel(feature)
+    plt.show()
+Purpose:
+sns.boxplot():
+Creates a box plot for the specified feature.
+color="red": Sets the box plot color to red for consistency.
+Titles and labels make each plot informative.
+Box Plot Components:
+Median (horizontal line): Indicates the central tendency of the feature values.
+Interquartile Range (IQR): The box spans from the 25th percentile (Q1) to the 75th percentile (Q3).
+Whiskers: Extend from Q1 - 1.5 * IQR to Q3 + 1.5 * IQR.
+Outliers: Data points outside the whisker range are shown as individual dots.
+Identifying and Discussing Distributions
+Key Observations:
+
+The shape and symmetry of the box plot indicate the distribution:
+A symmetric box suggests a normal distribution.
+A skewed box (where the median is closer to Q1 or Q3) suggests skewness.
+The length of whiskers and box size show variability.
+Outliers:
+
+Points outside the whiskers are outliers.
+Discussion:
+Outliers could be due to measurement errors or natural variations.
+They might require further investigation or preprocessing (e.g., removal, capping, or transformations).
+Feature Insights:
+
+Sepal Length & Width: Typically show a narrower range of values, with fewer or no significant outliers.
+Petal Length & Width: Often exhibit larger variability and may show distinct outliers.
+Applications
+Exploratory Data Analysis (EDA):
+
+Helps in understanding feature variability, central tendency, and spread.
+Outlier Detection:
+
+Identifies unusual data points that may impact model training.
+Feature Engineering:
+
+Insights from distributions can guide scaling, transformations, or handling of outliers.
+Data Visualization:
+
+Box plots effectively summarize numerical features for presentations or reports.
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+# 13. Use the covid_vaccine_statewise.csv dataset and perform the following
+# analytics.
+# a. Describe the dataset
+# b. Number of persons state wise vaccinated for first dose in India
+# c. Number of persons state wise vaccinated for second dose in India
+
+import pandas as pd
+
+# Load the dataset
+data = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/Covid Vaccine Statewise.csv')
+
+# a. Describe the dataset
+print("Dataset Description:\n")
+print(data.describe())
+print("\nDataset Info:\n")
+print(data.info())
+
+# b. Number of persons state-wise vaccinated for the first dose
+statewise_first_dose = data.groupby('State')['First Dose Administered'].sum()
+print("\nState-wise First Dose Administered:\n")
+print(statewise_first_dose)
+
+# c. Number of persons state-wise vaccinated for the second dose
+statewise_second_dose = data.groupby('State')['Second Dose Administered'].sum()
+print("\nState-wise Second Dose Administered:\n")
+print(statewise_second_dose)
+
+Code Breakdown
+Importing Libraries
+python
+Copy code
+import pandas as pd
+Purpose:
+pandas: For loading, analyzing, and manipulating the dataset.
+Loading the Dataset
+python
+Copy code
+data = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/Covid Vaccine Statewise.csv')
+Purpose:
+Reads the COVID-19 vaccine statewise dataset into a Pandas DataFrame named data.
+Task A: Describing the Dataset
+Dataset Description
+python
+Copy code
+print("Dataset Description:\n")
+print(data.describe())
+Purpose:
+data.describe():
+Provides summary statistics for numerical columns in the dataset, such as:
+Count, mean, standard deviation, minimum, and maximum values.
+Helps identify trends, data ranges, and outliers.
+Dataset Information
+python
+Copy code
+print("\nDataset Info:\n")
+print(data.info())
+Purpose:
+data.info():
+Displays information about the dataset, such as:
+Column names and their data types.
+Non-null counts for each column (useful for identifying missing data).
+Task B: State-wise Vaccination for the First Dose
+Summing First Dose Administered State-wise
+python
+Copy code
+statewise_first_dose = data.groupby('State')['First Dose Administered'].sum()
+print("\nState-wise First Dose Administered:\n")
+print(statewise_first_dose)
+Purpose:
+
+Groups data by the State column and sums the values in the First Dose Administered column for each state.
+groupby('State'): Groups data based on the unique states.
+.sum(): Aggregates the total vaccinations for the first dose for each state.
+Output:
+
+Displays the total number of first doses administered state-wise.
+Task C: State-wise Vaccination for the Second Dose
+Summing Second Dose Administered State-wise
+python
+Copy code
+statewise_second_dose = data.groupby('State')['Second Dose Administered'].sum()
+print("\nState-wise Second Dose Administered:\n")
+print(statewise_second_dose)
+Purpose:
+
+Groups data by the State column and sums the values in the Second Dose Administered column for each state.
+Similar to the first dose, this calculates the total number of second doses administered state-wise.
+Output:
+
+Displays the total number of second doses administered state-wise.
+Applications
+Data Exploration:
+
+Understands the structure and key statistics of the dataset through .describe() and .info().
+State-wise Insights:
+
+Provides state-specific vaccination data, helping analyze distribution and trends.
+Policy Planning:
+
+Enables government or health organizations to monitor vaccination progress across states.
+Reporting:
+
+Presents data for decision-making or generating reports on vaccine distribution.
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+# 14. Use the covid_vaccine_statewise.csv dataset and perform the following
+# analytics.
+# A. Describe the dataset.
+# B. Number of Males vaccinated
+# C.. Number of females vaccinated
+
+import pandas as pd
+
+data = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/Covid Vaccine Statewise.csv')
+
+print(data.describe())
+print(data.info())
+
+print(data['Male (Doses Administered)'].sum())
+print(data['Female (Doses Administered)'].sum())
+
+Applications
+Vaccination Coverage Analysis:
+
+Understanding the gender distribution of vaccine doses.
+Policy and Resource Allocation:
+
+Guides targeted campaigns to improve vaccine coverage for underrepresented genders.
+Public Health Monitoring:
+
+Tracks gender-specific trends in vaccination to ensure equitable distribution.
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#15.Use the dataset 'titanic'. The dataset contains 891 rows and contains information about the passengers who boarded the unfortunate Titanic ship. Use the Seaborn library to see if we can find any patterns in the data.
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load the Titanic dataset
+data = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/Titanic.csv')
+
+# Preview the first few rows of the dataset
+print(data.head())
+
+# Step 1: Plot histograms for numerical columns (Age, Fare, etc.)
+numerical_cols = ['Age', 'Fare']
+
+for col in numerical_cols:
+    plt.figure(figsize=(8, 6))
+    sns.histplot(data[col], kde=True, color='blue')
+    plt.title(f'Distribution of {col}')
+    plt.xlabel(col)
+    plt.ylabel('Frequency')
+    plt.show()
+
+# Step 2: Visualize survival rate by class (Pclass)
+plt.figure(figsize=(8, 6))
+sns.countplot(data=data, x='Pclass', hue='Survived', palette='coolwarm')
+plt.title('Survival Rate by Pclass')
+plt.xlabel('Passenger Class')
+plt.ylabel('Count')
+plt.show()
+
+# Step 3: Visualize survival rate by gender (Sex)
+plt.figure(figsize=(8, 6))
+sns.countplot(data=data, x='Sex', hue='Survived', palette='coolwarm')
+plt.title('Survival Rate by Gender')
+plt.xlabel('Gender')
+plt.ylabel('Count')
+plt.show()
+
+# Step 4: Visualize survival rate by age
+plt.figure(figsize=(8, 6))
+sns.histplot(data[data['Survived'] == 1]['Age'], kde=True, color='green', label='Survived')
+sns.histplot(data[data['Survived'] == 0]['Age'], kde=True, color='red', label='Not Survived')
+plt.title('Age Distribution of Survived vs Not Survived')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.legend()
+plt.show()
+
+# Step 5: Visualize survival rate by embarkation port (Embarked)
+plt.figure(figsize=(8, 6))
+sns.countplot(data=data, x='Embarked', hue='Survived', palette='coolwarm')
+plt.title('Survival Rate by Embarkation Port')
+plt.xlabel('Embarkation Port')
+plt.ylabel('Count')
+plt.show()
+
+# Step 6: Boxplot for age vs survival status
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=data, x='Survived', y='Age', palette='coolwarm')
+plt.title('Age Distribution by Survival Status')
+plt.xlabel('Survived')
+plt.ylabel('Age')
+plt.show()
+
+# Step 7: Create a correlation heatmap for numerical features
+corr = data.corr()
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
+plt.title('Correlation Heatmap of Numerical Features')
+plt.show()
+
+
+Step 1: Importing Libraries and Loading Data
+python
+Copy code
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load the Titanic dataset
+data = pd.read_csv('C:/Users/DELL/DSML_PRACTICAL/Datasets/Titanic.csv')
+
+# Preview the first few rows of the dataset
+print(data.head())
+We load the Titanic dataset into a pandas DataFrame.
+The head() function gives us a quick look at the first few rows of the dataset.
+Step 2: Visualizing the Distribution of Numerical Features
+To observe the distribution of numerical features like Age, Fare, etc., we can create histograms using sns.histplot().
+
+python
+Copy code
+# Plot histograms for numerical columns (Age, Fare, etc.)
+numerical_cols = ['Age', 'Fare']
+
+for col in numerical_cols:
+    plt.figure(figsize=(8, 6))
+    sns.histplot(data[col], kde=True, color='blue')
+    plt.title(f'Distribution of {col}')
+    plt.xlabel(col)
+    plt.ylabel('Frequency')
+    plt.show()
+sns.histplot(): This function creates a histogram and adds a KDE curve for a smoother visualization of the distribution.
+color='blue': We set the color of the histogram bars to blue.
+plt.show(): This displays the plot.
+Step 3: Visualizing Survival Rate vs. Key Features
+We can examine the relationship between the survival rate (Survived column) and other features like Pclass, Sex, Age, etc.
+
+Survival by Class (Pclass)
+python
+Copy code
+plt.figure(figsize=(8, 6))
+sns.countplot(data=data, x='Pclass', hue='Survived', palette='coolwarm')
+plt.title('Survival Rate by Pclass')
+plt.xlabel('Passenger Class')
+plt.ylabel('Count')
+plt.show()
+sns.countplot(): This counts the occurrences of each category of Pclass and splits the count by the Survived column using color differentiation (hue).
+The result will show the count of survivors and non-survivors across different passenger classes.
+Survival by Gender (Sex)
+python
+Copy code
+plt.figure(figsize=(8, 6))
+sns.countplot(data=data, x='Sex', hue='Survived', palette='coolwarm')
+plt.title('Survival Rate by Gender')
+plt.xlabel('Gender')
+plt.ylabel('Count')
+plt.show()
+This plot shows the survival rates split by gender, giving insight into whether women or men had higher survival rates.
+Step 4: Visualizing Survival Based on Age
+python
+Copy code
+plt.figure(figsize=(8, 6))
+sns.histplot(data[data['Survived'] == 1]['Age'], kde=True, color='green', label='Survived')
+sns.histplot(data[data['Survived'] == 0]['Age'], kde=True, color='red', label='Not Survived')
+plt.title('Age Distribution of Survived vs Not Survived')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.legend()
+plt.show()
+We create two separate histograms for passengers who survived and those who did not, using different colors.
+This can help identify age groups that were more likely to survive.
+Step 5: Survival vs. Embarked (Embarkation Port)
+python
+Copy code
+plt.figure(figsize=(8, 6))
+sns.countplot(data=data, x='Embarked', hue='Survived', palette='coolwarm')
+plt.title('Survival Rate by Embarkation Port')
+plt.xlabel('Embarkation Port')
+plt.ylabel('Count')
+plt.show()
+Embarked represents the port where passengers boarded the Titanic. This plot shows how survival rates varied across different boarding ports.
+Step 6: Boxplot for Age vs. Survival
+python
+Copy code
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=data, x='Survived', y='Age', palette='coolwarm')
+plt.title('Age Distribution by Survival Status')
+plt.xlabel('Survived')
+plt.ylabel('Age')
+plt.show()
+sns.boxplot(): This creates a box plot to visualize the spread of Age values based on whether the passenger survived (0 = No, 1 = Yes).
+Helps detect outliers and the central tendency (median) of ages for both survivors and non-survivors.
+Step 7: Correlation Heatmap of Numerical Features
+python
+Copy code
+# Compute correlation matrix
+corr = data.corr()
+
+# Create a heatmap of correlations
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
+plt.title('Correlation Heatmap of Numerical Features')
+plt.show()
+data.corr(): This computes the correlation matrix between numerical features.
+sns.heatmap(): Creates a heatmap to visually represent correlations, which helps identify any strong relationships between features.
+
+
+Short Application of Titanic Data Analysis
+Survival Factors:
+
+By Class & Gender: Analysis shows how passenger class and gender affected survival rates. Women and first-class passengers had higher survival chances.
+By Age: Children and younger adults had a higher survival rate, which could inform emergency protocols focusing on vulnerable groups.
+Embarkation Insights:
+
+Survival rates by embarkation port (e.g., Southampton, Cherbourg) provide insights into the evacuation process and resource allocation at different locations.
+Statistical Insights:
+
+Correlation: Strong correlations between features like Pclass, Fare, and Age can help build predictive models for survival.
+Predictive Modeling: The dataset can be used to train machine learning models to predict survival, aiding in future disaster preparedness.
+Emergency Management:
+
+Helps design better disaster response strategies, such as prioritizing certain groups during evacuations based on historical data.
+Real-World Usage:
+
+Machine Learning: The dataset serves as a useful case for teaching machine learning, focusing on classification tasks like survival prediction.
+Ethical Studies: Offers insights into how social factors (class, gender) influenced survival, contributing to discussions on fairness and equity in crisis situations.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+16.Use the inbuilt dataset 'titanic'. The dataset contains 891 rows and contains information about the passengers who boarded the unfortunate Titanic ship. Write a code to check how the price of the ticket (column name: 'fare') for each passenger is distributed by plotting a histogram.
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load the Titanic dataset
+file_path = '/content/Titanic.csv'
+titanic_data = pd.read_csv(file_path)
+
+# Clean column names
+titanic_data.columns = titanic_data.columns.str.strip()
+
+# Handle missing values in 'Fare'
+titanic_data['Fare'] = titanic_data['Fare'].fillna(0)
+
+# Check the structure of the dataset
+print(titanic_data.info())
+
+# Plot a histogram for the 'Fare' column
+plt.figure(figsize=(10, 6))
+sns.histplot(titanic_data['Fare'], bins=30, kde=True, color='blue')
+plt.title('Distribution of Ticket Prices (Fare)', fontsize=16)
+plt.xlabel('Fare', fontsize=14)
+plt.ylabel('Frequency', fontsize=14)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+
+ 
+Code Explanation
+Step 1: Import Libraries
+python
+Copy code
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+Purpose:
+pandas: For data manipulation and cleaning.
+seaborn: For statistical visualizations.
+matplotlib.pyplot: For creating and customizing plots.
+Step 2: Load the Titanic Dataset
+python
+Copy code
+file_path = '/content/Titanic.csv'
+titanic_data = pd.read_csv(file_path)
+Purpose:
+Loads the Titanic dataset from the specified file path into a Pandas DataFrame (titanic_data).
+Step 3: Clean Column Names
+python
+Copy code
+titanic_data.columns = titanic_data.columns.str.strip()
+Purpose:
+Removes any extra whitespace from column names, ensuring they are clean and consistent for further operations.
+Step 4: Handle Missing Values in 'Fare'
+python
+Copy code
+titanic_data['Fare'] = titanic_data['Fare'].fillna(0)
+Purpose:
+Fills missing values in the Fare column with 0.
+This ensures that there are no NaN values when performing computations or visualizations.
+Step 5: Check Dataset Structure
+python
+Copy code
+print(titanic_data.info())
+Purpose:
+Displays:
+Column names and their data types.
+Non-null value counts for each column.
+Helps identify potential missing data or anomalies in the dataset.
+Step 6: Plot a Histogram for 'Fare'
+python
+Copy code
+plt.figure(figsize=(10, 6))
+sns.histplot(titanic_data['Fare'], bins=30, kde=True, color='blue')
+plt.title('Distribution of Ticket Prices (Fare)', fontsize=16)
+plt.xlabel('Fare', fontsize=14)
+plt.ylabel('Frequency', fontsize=14)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+Purpose:
+plt.figure(figsize=(10, 6)): Sets the plot size to 10x6 inches for better readability.
+sns.histplot():
+Plots a histogram with 30 bins.
+Adds a Kernel Density Estimate (KDE) curve for visualizing the probability density of the Fare values.
+Uses color='blue' for styling.
+Titles and labels enhance interpretability.
+plt.grid(): Adds a grid to the y-axis for easier reading of frequencies.
+Histogram Insights
+Distribution:
+
+The histogram illustrates how ticket prices (Fare) are distributed among passengers.
+The KDE curve overlays the distribution's smoothed shape.
+Outliers:
+
+High ticket prices (e.g., 500+) appear as outliers.
+Skewness:
+
+The Fare distribution is typically right-skewed (many low-ticket prices and fewer high-ticket prices).
+Interpretation:
+
+Helps identify patterns or anomalies in ticket pricing, which could be related to passenger class, cabin, or socioeconomic factors.
+Applications
+Exploratory Data Analysis (EDA):
+
+Understands ticket price distributions and prepares data for further analysis.
+Feature Engineering:
+
+Identifies the need for transformations (e.g., log transformation) to handle skewed data.
+Data Cleaning:
+
+Ensures no missing values in critical columns like Fare.
+Visualization:
+
+Provides visual evidence of patterns for reports and presentations.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+18.	Use House_Price prediction dataset. Provide summary statistics (mean, median, minimum, maximum, standard deviation) of variables (categorical vs quantitative) such as- For example, if categorical variable is age groups and quantitative variable is income, then provide summary statistics of income grouped by the age groups.
+
+import pandas as pd
+
+# Load the dataset
+file_path = '/content/House Data.csv'
+house_data = pd.read_csv(file_path)
+
+# Check the structure of the dataset
+print(house_data.info())
+
+# Check the first few rows to understand the data
+print(house_data.head())
+
+# Identify categorical and quantitative variables
+# Assume that 'Age Group' is categorical and 'Income' is quantitative for the example
+# Replace 'Age Group' and 'Income' with actual column names from your dataset
+
+categorical_columns = house_data.select_dtypes(include=['object']).columns
+quantitative_columns = house_data.select_dtypes(include=['number']).columns
+
+# Display summary statistics for quantitative variables
+print("\nSummary Statistics for Quantitative Variables:")
+print(house_data[quantitative_columns].describe())
+
+# Example: Grouping by a categorical variable (e.g., 'Age Group') and summarizing a quantitative variable (e.g., 'Income')
+# Replace 'Age Group' and 'Income' with your actual column names from the dataset
+
+if 'Age Group' in house_data.columns and 'Income' in house_data.columns:
+    print("\nSummary Statistics of 'Income' Grouped by 'Age Group':")
+    income_by_age_group = house_data.groupby('Age Group')['Income'].describe()
+    print(income_by_age_group)
+else:
+    print("\nNo 'Age Group' or 'Income' column found in the dataset. Please check the column names.")
+
+Applications
+Market Segmentation:
+
+Understanding how the house prices vary across different regions, house types, or income groups.
+Pricing Strategy:
+
+Helps in determining price differences based on property characteristics (e.g., house type, age group).
+Predictive Modeling:
+
+Useful for building machine learning models by examining how different groups or categories influence the dependent variable (e.g., Price).
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+19.	Write a Python program to display some basic statistical details like percentile, mean, standard deviation etc (Use python and pandas commands) the species of ‘Iris-setosa’, ‘Iris-versicolor’ and ‘Iris-versicolor’ of iris.csv dataset.
+
+import pandas as pd
+
+# Load the Iris dataset
+file_path = '/content/IRIS.csv'
+iris_data = pd.read_csv(file_path)
+
+# Check the first few rows to understand the structure
+print(iris_data.head())
+
+# Group by species and calculate statistical details for each species
+species_stats = iris_data.groupby('species').describe()
+
+# Display basic statistics for each species
+print("\nStatistical details for each species:")
+print(species_stats)
+
+# Calculate specific statistical details for each species
+for species in ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica']:
+    print(f"\nStatistics for {species}:")
+    
+    species_data = iris_data[iris_data['species'] == species]
+    
+    # Calculate statistics only for numeric columns
+    numeric_columns = species_data.select_dtypes(include=['float64', 'int64']).columns
+    
+    # Mean
+    print(f"Mean:\n{species_data[numeric_columns].mean()}")
+    
+    # Standard Deviation
+    print(f"Standard Deviation:\n{species_data[numeric_columns].std()}")
+    
+    # 25th, 50th, and 75th Percentiles
+    print(f"Percentiles (25th, 50th, 75th):")
+    print(species_data[numeric_columns].quantile([0.25, 0.5, 0.75]))
+Real-World Application:
+2. Agriculture (Crop & Flower Yield Prediction)
+Scenario: In agriculture, especially in flower farming, predicting the yield of certain types of flowers based on environmental factors is crucial. Flower producers use data-driven insights to determine optimal growing conditions and predict flower yield.
+Application:
+The dataset can be used to calculate how variations in the physical features (sepal length, petal width) affect the yield of each flower species.
+By analyzing the mean, median, standard deviation, and percentiles, farmers can determine which flower species or conditions lead to the most consistent or largest blooms.
+Histograms and box plots help visualize the distribution of flower features, indicating any outliers or extreme conditions that could be contributing to the variation in yields.
+
+

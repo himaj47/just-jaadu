@@ -1,0 +1,20 @@
+#17/22 Compute Accuracy, Error rate, Precision, Recall for following confusion
+# matrix ( Use formula for each)
+
+# True Positives (TPs): 1 False Positives (FPs): 1
+# False Negatives (FNs): 8 True Negatives (TNs): 90
+
+TP = 1
+FP = 1
+FN = 8
+TN = 90
+
+precision = TP/(TP + FP)
+recall = TP/(TP + FN)
+error_rate = (FP + FN)/(TP + FP + FP + FN)
+accuracy = (TP + TN)/(TP + FP + FP + FN)
+
+print("precision: " + str(precision))
+print("recall: " + str(recall))
+print("error_rate: " + str(error_rate))
+print("accuracy: " + str(accuracy))

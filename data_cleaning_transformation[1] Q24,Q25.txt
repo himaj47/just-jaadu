@@ -1,0 +1,310 @@
+
+#25  Perform Data Cleaning, Data transformation using Python on any data set.
+1. Code:
+python
+Copy code
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+# Step 1: Read the dataset
+file_path = './sample_data/Age Table.xlsx'  # Replace with your actual file path
+df = pd.read_excel(file_path)
+
+# Debug: Display column names to verify
+print("Column Names in Dataset:")
+print(df.columns)
+
+# Step 2: Check for missing values
+print("\nChecking for missing values...")
+if df.isnull().sum().sum() > 0:
+    print("Missing values found! Handling them...")
+    df = df.fillna(method='ffill')  # Forward fill for simplicity
+else:
+    print("No missing values found!")
+
+# Step 3: Strip whitespace from column names (optional)
+df.columns = df.columns.str.strip()
+
+# Step 4: Encode categorical variables
+print("\nEncoding categorical variables...")
+label_encoders = {}
+expected_columns = ["Age", "Income", "Married", "Health", "Class"]
+
+# Verify all expected columns are in the dataset
+for column in expected_columns:
+    if column not in df.columns:
+        raise KeyError(f"Column '{column}' not found in the dataset!")
+
+# Apply encoding
+for column in expected_columns:
+    le = LabelEncoder()
+    df[column] = le.fit_transform(df[column])
+    label_encoders[column] = le
+print("Categorical variables encoded.")
+
+# Step 5: Feature Scaling (optional for numeric columns like Income)
+print("\nScaling numeric features...")
+scaler = StandardScaler()
+df["Income"] = scaler.fit_transform(df[["Income"]])
+print("Feature scaling complete.")
+
+# Step 6: Display the cleaned and transformed dataset
+print("\nTransformed Dataset:")
+print(df)
+
+# Step 7: Save the cleaned dataset (optional)
+output_file = './sample_data/cleaned_dataset.xlsx'
+df.to_excel(output_file, index=False)
+print(f"\nCleaned dataset saved to {output_file}")
+2. Line-by-Line Explanation:
+Import Libraries:
+python
+Copy code
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+pandas: Used to handle and manipulate the dataset.
+LabelEncoder: Encodes categorical data into numerical form.
+StandardScaler: Scales numerical data to have a mean of 0 and a standard deviation of 1.
+Step 1: Read Dataset:
+python
+Copy code
+file_path = './sample_data/Age Table.xlsx'
+df = pd.read_excel(file_path)
+Loads the dataset from the provided Excel file path into a pandas DataFrame.
+Debugging Column Names:
+python
+Copy code
+print("Column Names in Dataset:")
+print(df.columns)
+Displays the column names to verify the structure of the dataset.
+Step 2: Handle Missing Values:
+python
+Copy code
+if df.isnull().sum().sum() > 0:
+    df = df.fillna(method='ffill')
+df.isnull().sum().sum(): Checks for missing values across all columns.
+fillna(method='ffill'): Fills missing values using forward fill (copies the value from the previous row).
+Step 3: Clean Column Names:
+python
+Copy code
+df.columns = df.columns.str.strip()
+Removes extra spaces from column names.
+Step 4: Encode Categorical Variables:
+python
+Copy code
+label_encoders = {}
+expected_columns = ["Age", "Income", "Married", "Health", "Class"]
+
+for column in expected_columns:
+    le = LabelEncoder()
+    df[column] = le.fit_transform(df[column])
+    label_encoders[column] = le
+label_encoders: Dictionary to store encoders for each column.
+le.fit_transform(): Encodes string values into integers.
+Step 5: Feature Scaling:
+python
+Copy code
+scaler = StandardScaler()
+df["Income"] = scaler.fit_transform(df[["Income"]])
+Scales the "Income" column to normalize numerical values.
+Step 6: Display Cleaned Data:
+python
+Copy code
+print(df)
+Outputs the transformed dataset.
+Step 7: Save Cleaned Data:
+python
+Copy code
+df.to_excel(output_file, index=False)
+Saves the cleaned and transformed dataset to an Excel file.
+3. Function and Method Explanation:
+pd.read_excel():
+Reads an Excel file into a pandas DataFrame.
+df.isnull():
+Identifies missing values in the dataset.
+fillna():
+Replaces missing values based on the specified method.
+str.strip():
+Removes unnecessary whitespace from strings.
+LabelEncoder:
+Encodes categorical data into numerical format (e.g., "Male" → 0, "Female" → 1).
+StandardScaler:
+Normalizes numerical data by centering and scaling.
+to_excel():
+Saves the DataFrame to an Excel file.
+4. Applications:
+Preprocessing Data for Machine Learning:
+
+Encoded categorical data and scaled numerical features can be directly used in machine learning models.
+Cleaning Raw Data:
+
+Ensures that missing values are handled, column names are clean, and data is consistent for analysis.
+Dataset Transformation for Analytics:
+
+Transforms raw data into a structured and normalized format for statistical or business analysis.
+Data Sharing:
+
+Cleaned datasets can be shared with collaborators or used in reporting tools.
+If you have more specific questions or need further clarification, let me know!
+=======================================================================================================================================================
+
+#24.Perform the following operations using Python on a suitable data set, counting unique values of data, format of each column, converting variable data type (e.g. from long to short, vice versa), identifying missing values and filling in the missing values.
+import pandas as pd
+import numpy as np
+
+
+# Read data from the Excel file
+file_path = './sample_data/Age Table.xlsx'
+df = pd.read_excel(file_path)
+
+print(df.head())  # Check if the data is read correctly
+
+# Introduce some missing values for demonstration
+df.loc[3, 'Income'] = np.nan
+df.loc[7, 'Married'] = np.nan
+
+# 1. Count unique values in each column
+unique_values = df.nunique()
+
+# 2. Determine the format of each column
+column_formats = df.dtypes
+
+# 3. Convert a variable data type (e.g., Income from object to category)
+df['Income'] = df['Income'].astype('category')
+
+# 4. Identify missing values
+missing_values = df.isnull().sum()
+
+# 5. Fill missing values with mode
+df_filled = df.copy()
+df_filled['Income'].fillna(df['Income'].mode()[0], inplace=True)
+df_filled['Married'].fillna(df['Married'].mode()[0], inplace=True)
+
+# Print results
+print("Unique values in each column:")
+print(unique_values)
+
+print("\nFormat of each column:")
+print(column_formats)
+
+print("\nMissing values in each column:")
+print(missing_values)
+
+print("\nDataset after filling missing values:")
+print(df_filled)
+
+Code Explanation
+Import Libraries
+python
+Copy code
+import pandas as pd
+import numpy as np
+pandas is a library for data manipulation and analysis.
+numpy is used for numerical operations and to handle missing data (np.nan).
+Read Data
+python
+Copy code
+file_path = './sample_data/Age Table.xlsx'
+df = pd.read_excel(file_path)
+Purpose: Reads an Excel file located at the specified path into a Pandas DataFrame.
+Function Used: pd.read_excel() reads data from Excel files.
+Output: df contains the data from the Excel file.
+Check Data
+python
+Copy code
+print(df.head())  # Check if the data is read correctly
+Purpose: Displays the first 5 rows of the DataFrame to verify the data is loaded correctly.
+Function Used: .head() returns the first few rows.
+Introduce Missing Values
+python
+Copy code
+df.loc[3, 'Income'] = np.nan
+df.loc[7, 'Married'] = np.nan
+Purpose: Introduces missing values in specific cells for demonstration.
+Function Used:
+.loc[] is used to access specific rows and columns of the DataFrame.
+np.nan represents missing data in NumPy.
+Count Unique Values
+python
+Copy code
+unique_values = df.nunique()
+Purpose: Counts the number of unique values in each column of the DataFrame.
+Function Used: .nunique() computes the count of unique values for each column.
+Determine Column Formats
+python
+Copy code
+column_formats = df.dtypes
+Purpose: Identifies the data type of each column in the DataFrame.
+Function Used: .dtypes shows the data types (int64, float64, object, etc.).
+Convert Data Type
+python
+Copy code
+df['Income'] = df['Income'].astype('category')
+Purpose: Converts the Income column data type from its original type (likely object) to category to optimize memory usage and processing speed.
+Function Used: .astype() converts the data type of a column.
+Identify Missing Values
+python
+Copy code
+missing_values = df.isnull().sum()
+Purpose: Identifies the count of missing values in each column.
+Function Used:
+.isnull() returns a Boolean DataFrame indicating True for missing values.
+.sum() computes the total number of missing values per column.
+Fill Missing Values
+python
+Copy code
+df_filled = df.copy()
+df_filled['Income'].fillna(df['Income'].mode()[0], inplace=True)
+df_filled['Married'].fillna(df['Married'].mode()[0], inplace=True)
+Purpose: Fills missing values with the mode (most frequent value) of each column.
+Steps:
+.copy() creates a duplicate DataFrame to preserve the original.
+.fillna() replaces missing values with a specified value.
+.mode()[0] retrieves the most frequent value (mode) in the column.
+inplace=True modifies the DataFrame directly.
+Print Results
+python
+Copy code
+print("Unique values in each column:")
+print(unique_values)
+
+print("\nFormat of each column:")
+print(column_formats)
+
+print("\nMissing values in each column:")
+print(missing_values)
+
+print("\nDataset after filling missing values:")
+print(df_filled)
+Purpose: Displays the results for:
+Unique values in each column.
+Data type of each column.
+Count of missing values.
+DataFrame after filling missing values.
+Applications
+Data Preprocessing for Machine Learning:
+Filling missing values and optimizing data types are crucial preprocessing steps for machine learning algorithms.
+Exploratory Data Analysis (EDA):
+Identifying unique values and column formats helps in understanding the dataset structure.
+Data Cleaning:
+Handling missing data ensures the dataset is complete and ready for analysis.
+Optimization:
+Converting data types to category saves memory, which is especially beneficial for large datasets.
+Let me know if you need further clarification or enhancements to this explanation!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

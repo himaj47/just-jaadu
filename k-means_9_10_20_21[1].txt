@@ -1,0 +1,511 @@
+#20/21.	Write a program to cluster a set of points using K-means for IRIS dataset. Consider, K=3, clusters. Consider Euclidean distance as the distance measure. Randomly initialize a cluster mean as one of the data points. Iterate at least for 10 iterations. After iterations are over, print the final cluster means for each of the clusters.
+import pandas as pd
+import numpy as np
+
+# Load the data from the Excel file
+file_path = './sample_data/IRIS.csv'
+df = pd.read_csv(file_path)
+
+# Check the first few rows to understand the structure of the dataset
+print(df.head())
+
+# Assuming the last column is non-numeric ('species'), we will drop it for clustering
+features = df.iloc[:, :-1].values  # Select all columns except the last one
+
+# Initialize K-means algorithm
+np.random.seed(42)
+k = 3  # Number of clusters
+
+# Randomly initialize cluster centers (choose random data points as initial centroids)
+initial_indices = np.random.choice(features.shape[0], k, replace=False)
+centroids = features[initial_indices]
+
+# Function to compute Euclidean distance
+def euclidean_distance(point1, point2):
+    return np.sqrt(np.sum((point1 - point2) ** 2))
+
+# Perform K-means clustering (10 iterations)
+num_iterations = 10
+for _ in range(num_iterations):
+    # Assign points to the nearest cluster
+    clusters = [[] for _ in range(k)]
+    for point in features:
+        distances = [euclidean_distance(point, centroid) for centroid in centroids]
+        cluster_idx = np.argmin(distances)
+        clusters[cluster_idx].append(point)
+
+    # Update centroids as the mean of all points in the cluster
+    new_centroids = []
+    for cluster in clusters:
+        new_centroids.append(np.mean(cluster, axis=0))
+    centroids = np.array(new_centroids)
+
+# Print the final cluster means (centroids)
+for i, centroid in enumerate(centroids):
+    print(f"Cluster {i + 1} mean: {centroid}")
+
+
+2. Line-by-Line Explanation:
+Loading and Preparing the Dataset:
+python
+Copy code
+file_path = './sample_data/IRIS.csv'
+df = pd.read_csv(file_path)
+features = df.iloc[:, :-1].values
+pd.read_csv: Reads the dataset from the specified file path.
+iloc[:, :-1]: Extracts all columns except the last one (assumed to be categorical and not used in clustering).
+Initializing Clusters:
+python
+Copy code
+k = 3  # Number of clusters
+initial_indices = np.random.choice(features.shape[0], k, replace=False)
+centroids = features[initial_indices]
+np.random.choice: Randomly selects k data points as the initial cluster centroids.
+Defining Euclidean Distance:
+python
+Copy code
+def euclidean_distance(point1, point2):
+    return np.sqrt(np.sum((point1 - point2) ** 2))
+Computes the Euclidean distance between two points in feature space.
+K-Means Iterations:
+python
+Copy code
+for _ in range(num_iterations):
+    clusters = [[] for _ in range(k)]
+    for point in features:
+        distances = [euclidean_distance(point, centroid) for centroid in centroids]
+        cluster_idx = np.argmin(distances)
+        clusters[cluster_idx].append(point)
+
+    new_centroids = []
+    for cluster in clusters:
+        new_centroids.append(np.mean(cluster, axis=0))
+    centroids = np.array(new_centroids)
+For each iteration:
+Assign Points: Each data point is assigned to the cluster with the closest centroid using euclidean_distance.
+Update Centroids: The centroid for each cluster is recalculated as the mean of the assigned points.
+Printing Final Centroids:
+python
+Copy code
+for i, centroid in enumerate(centroids):
+    print(f"Cluster {i + 1} mean: {centroid}")
+Outputs the final cluster centroids after all iterations.
+3. Applications:
+Customer Segmentation:
+
+Grouping customers based on purchasing behavior for targeted marketing.
+Image Compression:
+
+K-means can reduce image size by clustering similar pixel values.
+Anomaly Detection:
+
+Identifying unusual data points by measuring their distance to the nearest cluster centroid.
+Iris Dataset Use:
+
+Classifying species of flowers based on physical attributes (e.g., petal length, sepal width).
+Data Summarization:
+
+Grouping large datasets into smaller, interpretable clusters.
+===============================================================================================================================================
+
+
+
+#9.	Write a program to do the following: You have given a collection of 8 points. P1=[0.1,0.6] P2=[0.15,0.71] P3=[0.08,0.9] P4=[0.16, 0.85] P5=[0.2,0.3] P6=[0.25,0.5] P7=[0.24,0.1] P8=[0.3,0.2]. Perform the k-mean clustering with initial centroids as m1=P1 =Cluster#1=C1 and m2=P8=cluster#2=C2. Answer the following 1] Which cluster does P6 belong to? 2] What is the population of a cluster around m2? 3] What is the updated value of m1 and m2?
+#
+
+import numpy as np
+
+# Points
+P1 = np.array([0.1, 0.6])
+P2 = np.array([0.15, 0.71])
+P3 = np.array([0.08, 0.9])
+P4 = np.array([0.16, 0.85])
+P5 = np.array([0.2, 0.3])
+P6 = np.array([0.25, 0.5])
+P7 = np.array([0.24, 0.1])
+P8 = np.array([0.3, 0.2])
+
+# List of points
+points = [P1, P2, P3, P4, P5, P6, P7, P8]
+
+# Initial centroids
+m1 = P1
+m2 = P8
+
+# Function to compute Euclidean distance
+def euclidean_distance(p1, p2):
+    return np.sqrt(np.sum((p1 - p2) ** 2))
+
+# K-means clustering function
+def kmeans_clustering(points, m1, m2, max_iters=100):
+    for _ in range(max_iters):
+        # Assign points to the nearest centroid
+        C1, C2 = [], []
+        for p in points:
+            dist_to_m1 = euclidean_distance(p, m1)
+            dist_to_m2 = euclidean_distance(p, m2)
+            if dist_to_m1 < dist_to_m2:
+                C1.append(p)
+            else:
+                C2.append(p)
+
+        # Calculate new centroids
+        new_m1 = np.mean(C1, axis=0) if C1 else m1
+        new_m2 = np.mean(C2, axis=0) if C2 else m2
+
+        # If centroids haven't changed, stop the loop
+        if np.array_equal(new_m1, m1) and np.array_equal(new_m2, m2):
+            break
+
+        # Update centroids
+        m1, m2 = new_m1, new_m2
+
+    return C1, C2, m1, m2
+
+# Perform K-means clustering
+C1, C2, new_m1, new_m2 = kmeans_clustering(points, m1, m2)
+
+# 1] Which cluster does P6 belong to?
+p6 = P6
+dist_to_m1 = euclidean_distance(p6, new_m1)
+dist_to_m2 = euclidean_distance(p6, new_m2)
+cluster_p6 = 1 if dist_to_m1 < dist_to_m2 else 2
+
+# 2] What is the population of a cluster around m2?
+population_cluster_m2 = len(C2)
+
+# 3] What is the updated value of m1 and m2?
+updated_m1 = new_m1
+updated_m2 = new_m2
+
+# Print the results
+print(f"1] P6 belongs to Cluster #{cluster_p6}")
+print(f"2] The population of the cluster around m2 is {population_cluster_m2}")
+print(f"3] Updated value of m1: {updated_m1}")
+print(f"   Updated value of m2: {updated_m2}")
+ChatGPT said:
+ChatGPT
+Here’s the detailed breakdown of the program with explanations of each line, the functions used, and the application of the code:
+
+Code Explanation
+Import Libraries
+python
+Copy code
+import numpy as np
+numpy is a library used for numerical computations, specifically for handling arrays and performing mathematical operations efficiently.
+Points
+python
+Copy code
+P1 = np.array([0.1, 0.6])
+P2 = np.array([0.15, 0.71])
+P3 = np.array([0.08, 0.9])
+P4 = np.array([0.16, 0.85])
+P5 = np.array([0.2, 0.3])
+P6 = np.array([0.25, 0.5])
+P7 = np.array([0.24, 0.1])
+P8 = np.array([0.3, 0.2])
+Each point represents a 2D coordinate.
+np.array() creates a NumPy array for each point to enable vectorized operations.
+Points List
+python
+Copy code
+points = [P1, P2, P3, P4, P5, P6, P7, P8]
+Groups all the points into a list for iteration and clustering.
+Initial Centroids
+python
+Copy code
+m1 = P1
+m2 = P8
+Initializes the centroids for the clusters.
+m1: Initial centroid for Cluster 1 (C1).
+m2: Initial centroid for Cluster 2 (C2).
+Euclidean Distance Function
+python
+Copy code
+def euclidean_distance(p1, p2):
+    return np.sqrt(np.sum((p1 - p2) ** 2))
+Purpose: Calculates the Euclidean distance between two points.
+Formula: 
+𝑑
+=
+∑
+(
+𝑥
+1
+−
+𝑥
+2
+)
+2
+d= 
+∑(x 
+1
+​
+ −x 
+2
+​
+ ) 
+2
+ 
+​
+ 
+Input: Two points p1 and p2.
+Output: The distance between the points.
+K-means Clustering Function
+python
+Copy code
+def kmeans_clustering(points, m1, m2, max_iters=100):
+Purpose: Implements the K-means clustering algorithm.
+Input:
+points: List of all points.
+m1, m2: Initial centroids for the clusters.
+max_iters: Maximum number of iterations to prevent infinite loops.
+Cluster Assignment
+python
+Copy code
+C1, C2 = [], []
+for p in points:
+    dist_to_m1 = euclidean_distance(p, m1)
+    dist_to_m2 = euclidean_distance(p, m2)
+    if dist_to_m1 < dist_to_m2:
+        C1.append(p)
+    else:
+        C2.append(p)
+Iterates over all points and calculates their distance to m1 and m2.
+Points are assigned to the cluster with the nearest centroid.
+If distance to m1 is smaller, the point is added to C1.
+Otherwise, it is added to C2.
+Centroid Update
+python
+Copy code
+new_m1 = np.mean(C1, axis=0) if C1 else m1
+new_m2 = np.mean(C2, axis=0) if C2 else m2
+Purpose: Recomputes the centroids as the mean of the points in each cluster.
+Function Used:
+np.mean(C1, axis=0): Computes the mean for C1 along each dimension (x and y).
+If a cluster is empty, the centroid remains unchanged.
+Convergence Check
+python
+Copy code
+if np.array_equal(new_m1, m1) and np.array_equal(new_m2, m2):
+    break
+Purpose: Stops the algorithm if the centroids do not change, indicating convergence.
+Cluster Assignment of P6
+python
+Copy code
+dist_to_m1 = euclidean_distance(p6, new_m1)
+dist_to_m2 = euclidean_distance(p6, new_m2)
+cluster_p6 = 1 if dist_to_m1 < dist_to_m2 else 2
+Calculates the distance of P6 to the updated centroids and determines its cluster.
+Population of Cluster Around m2
+python
+Copy code
+population_cluster_m2 = len(C2)
+Counts the number of points assigned to Cluster 2 (C2).
+Print Results
+python
+Copy code
+print(f"1] P6 belongs to Cluster #{cluster_p6}")
+print(f"2] The population of the cluster around m2 is {population_cluster_m2}")
+print(f"3] Updated value of m1: {updated_m1}")
+print(f"   Updated value of m2: {updated_m2}")
+Displays:
+The cluster to which P6 belongs.
+The population of points in Cluster 2.
+The updated centroids for Cluster 1 and Cluster 2.
+Applications
+Clustering and Data Segmentation:
+
+Useful in customer segmentation, pattern recognition, and grouping data points with similar properties.
+Optimization:
+
+K-means is used in optimization problems to reduce the intra-cluster variance.
+Dimensionality Reduction:
+
+Helps identify natural groupings in datasets for further dimensionality reduction.
+Real-World Use Cases:
+
+Market analysis, recommendation systems, and image compression.
+Let me know if you need additional details or further clarification!
+
+=======================================================================================================================================================
+
+
+#10.	Write a program to do the following: You have given a collection of 8 points. P1=[2, 10] P2=[2, 5] P3=[8, 4] P4=[5, 8] P5=[7,5] P6=[6, 4] P7=[1, 2] P8=[4, 9]. Perform the k-mean clustering with initial centroids as m1=P1 =Cluster#1=C1 and m2=P4=cluster#2=C2, m3=P7 =Cluster#3=C3. Answer the following 1] Which cluster does P6 belong to? 2] What is the population of a cluster around m3? 3] What is the updated value of m1, m2, m3?
+import numpy as np
+
+# Given points
+P1 = np.array([2, 10])
+P2 = np.array([2, 5])
+P3 = np.array([8, 4])
+P4 = np.array([5, 8])
+P5 = np.array([7, 5])
+P6 = np.array([6, 4])
+P7 = np.array([1, 2])
+P8 = np.array([4, 9])
+
+points = np.array([P1, P2, P3, P4, P5, P6, P7, P8])
+
+# Initial centroids
+m1 = np.array([2, 10])
+m2 = np.array([5, 8])
+m3 = np.array([1, 2])
+
+# Function to calculate Euclidean distance
+def euclidean_distance(p1, p2):
+    return np.sqrt(np.sum((p1 - p2) ** 2))
+
+# Function to assign points to the nearest centroid
+def assign_to_centroids(points, centroids):
+    clusters = {0: [], 1: [], 2: []}  # 3 clusters: C1, C2, C3
+    for point in points:
+        distances = [euclidean_distance(point, centroid) for centroid in centroids]
+        cluster_index = np.argmin(distances)
+        clusters[cluster_index].append(point)
+    return clusters
+
+# Function to update centroids
+def update_centroids(clusters):
+    new_centroids = []
+    for cluster in clusters.values():
+        new_centroids.append(np.mean(cluster, axis=0))
+    return np.array(new_centroids)
+
+# K-means clustering function
+def k_means(points, centroids, max_iterations=10):
+    for _ in range(max_iterations):
+        clusters = assign_to_centroids(points, centroids)
+        new_centroids = update_centroids(clusters)
+
+        # Check for convergence (if centroids don't change)
+        if np.allclose(new_centroids, centroids):
+            break
+        centroids = new_centroids
+    return centroids, clusters
+
+# Perform K-means clustering
+centroids = np.array([m1, m2, m3])
+updated_centroids, clusters = k_means(points, centroids)
+
+# Answer the questions:
+# 1. Which cluster does P6 belong to?
+p6 = P6
+distances = [euclidean_distance(p6, centroid) for centroid in updated_centroids]
+cluster_for_p6 = np.argmin(distances)
+
+# 2. What is the population of the cluster around m3?
+population_m3 = len(clusters[2])
+
+# 3. What are the updated values of m1, m2, m3?
+updated_m1, updated_m2, updated_m3 = updated_centroids
+
+# Print answers
+print(f"1. P6 belongs to Cluster {cluster_for_p6 + 1}.")
+print(f"2. The population of the cluster around m3 is {population_m3}.")
+print(f"3. The updated centroids are:\n m1 = {updated_m1}\n m2 = {updated_m2}\n m3 = {updated_m3}")
+
+Explanation of Code:
+Input Data:
+python
+Copy code
+P1 = np.array([2, 10])  # Point 1
+...
+points = np.array([P1, P2, P3, P4, P5, P6, P7, P8])
+The coordinates of 8 given points are stored as NumPy arrays for efficient computation.
+Initialization:
+python
+Copy code
+m1 = np.array([2, 10])  # Cluster 1 centroid
+m2 = np.array([5, 8])   # Cluster 2 centroid
+m3 = np.array([1, 2])   # Cluster 3 centroid
+Initial centroids for the 3 clusters are selected as given in the problem statement.
+Euclidean Distance Calculation:
+python
+Copy code
+def euclidean_distance(p1, p2):
+    return np.sqrt(np.sum((p1 - p2) ** 2))
+Computes the Euclidean distance between two points using the formula:
+𝑑
+=
+∑
+𝑖
+=
+1
+𝑛
+(
+𝑥
+𝑖
+−
+𝑦
+𝑖
+)
+2
+d= 
+i=1
+∑
+n
+​
+ (x 
+i
+​
+ −y 
+i
+​
+ ) 
+2
+ 
+​
+ 
+Assigning Points to Clusters:
+python
+Copy code
+def assign_to_centroids(points, centroids):
+    clusters = {0: [], 1: [], 2: []}
+    for point in points:
+        distances = [euclidean_distance(point, centroid) for centroid in centroids]
+        cluster_index = np.argmin(distances)
+        clusters[cluster_index].append(point)
+    return clusters
+Each point is assigned to the cluster whose centroid is the closest based on Euclidean distance.
+Updating Centroids:
+python
+Copy code
+def update_centroids(clusters):
+    new_centroids = []
+    for cluster in clusters.values():
+        new_centroids.append(np.mean(cluster, axis=0))
+    return np.array(new_centroids)
+For each cluster, the new centroid is computed as the mean of all points in the cluster.
+K-Means Iterations:
+python
+Copy code
+def k_means(points, centroids, max_iterations=10):
+    ...
+    return centroids, clusters
+The clustering process is repeated for a fixed number of iterations or until centroids stop changing.
+Question Analysis:
+Which cluster does P6 belong to?:
+python
+Copy code
+cluster_for_p6 = np.argmin(distances)
+Computes the cluster index with the smallest distance to P6.
+Population around m3:
+python
+Copy code
+population_m3 = len(clusters[2])
+Counts the number of points assigned to cluster C3 (index 2).
+Updated Centroids:
+python
+Copy code
+updated_m1, updated_m2, updated_m3 = updated_centroids
+Extracts the final cluster centroids.
+3. Applications:
+Market Segmentation:
+Grouping customers based on purchasing patterns.
+Image Quantization:
+Compressing images by reducing color palettes.
+Anomaly Detection:
+Identifying data points that deviate significantly from cluster centers.
+Geographic Mapping:
+Clustering regions based on demographic or environmental data.
+Let me know if you need further assistance!

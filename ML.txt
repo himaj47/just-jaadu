@@ -1,0 +1,267 @@
+Fundamental Concepts
+What is Machine Learning?
+Machine Learning (ML) is a subset of artificial intelligence that enables systems to learn patterns from data and make predictions or decisions without being explicitly programmed.
+
+Difference between Supervised, Unsupervised, and Reinforcement Learning.
+
+Supervised Learning: Uses labeled data to predict outcomes (e.g., Regression, Classification).
+Unsupervised Learning: Identifies patterns in unlabeled data (e.g., Clustering, Dimensionality Reduction).
+Reinforcement Learning: Learns through trial and error by receiving rewards or penalties (e.g., Q-Learning).
+Difference between AI, Machine Learning, and Deep Learning.
+
+AI: Broad field for creating intelligent systems.
+ML: Subset of AI focused on learning from data.
+Deep Learning: Subset of ML using neural networks with multiple layers.
+Explain Overfitting and Underfitting. How do you prevent them?
+
+Overfitting: Model fits training data too well but performs poorly on new data.
+Prevention: Use regularization (L1, L2), pruning, or cross-validation.
+Underfitting: Model is too simple and fails to capture the data's complexity.
+Prevention: Increase model complexity or train longer.
+Difference between Parametric and Non-Parametric Models.
+
+Parametric Models: Fixed number of parameters (e.g., Linear Regression).
+Non-Parametric Models: Number of parameters grows with the data (e.g., KNN).
+Regression Questions
+What is Linear Regression? How does it work?
+Linear Regression models the relationship between dependent and independent variables using a linear equation:
+𝑦
+=
+𝛽
+0
++
+𝛽
+1
+𝑥
++
+𝜖
+y=β 
+0
+​
+ +β 
+1
+​
+ x+ϵ
+where 
+𝛽
+0
+β 
+0
+​
+  is the intercept, 
+𝛽
+1
+β 
+1
+​
+  is the slope, and 
+𝜖
+ϵ is the error term.
+
+Explain Multiple Linear Regression.
+It extends linear regression to include multiple independent variables:
+𝑦
+=
+𝛽
+0
++
+𝛽
+1
+𝑥
+1
++
+𝛽
+2
+𝑥
+2
++
+⋯
++
+𝛽
+𝑛
+𝑥
+𝑛
++
+𝜖
+y=β 
+0
+​
+ +β 
+1
+​
+ x 
+1
+​
+ +β 
+2
+​
+ x 
+2
+​
+ +⋯+β 
+n
+​
+ x 
+n
+​
+ +ϵ
+
+What is the difference between Linear and Logistic Regression?
+
+Linear Regression: Used for predicting continuous outcomes.
+Logistic Regression: Used for binary classification problems; predicts the probability that an instance belongs to a class using a sigmoid function.
+What is Ridge and Lasso Regression?
+
+Ridge Regression (L2 Regularization): Adds penalty proportional to the sum of squared coefficients.
+Cost Function
+=
+RSS
++
+𝜆
+∑
+𝛽
+𝑗
+2
+Cost Function=RSS+λ∑β 
+j
+2
+​
+ 
+Lasso Regression (L1 Regularization): Adds penalty proportional to the sum of absolute coefficients.
+Cost Function
+=
+RSS
++
+𝜆
+∑
+∣
+𝛽
+𝑗
+∣
+Cost Function=RSS+λ∑∣β 
+j
+​
+ ∣
+Explain the concept of Polynomial Regression.
+It extends Linear Regression by adding polynomial terms to the model, enabling it to capture non-linear relationships:
+𝑦
+=
+𝛽
+0
++
+𝛽
+1
+𝑥
++
+𝛽
+2
+𝑥
+2
++
+⋯
++
+𝛽
+𝑛
+𝑥
+𝑛
+y=β 
+0
+​
+ +β 
+1
+​
+ x+β 
+2
+​
+ x 
+2
+ +⋯+β 
+n
+​
+ x 
+n
+ 
+
+Model Evaluation and Metrics
+Difference between Precision, Recall, and F1-score.
+Precision: Ratio of true positives to total predicted positives.
+Precision
+=
+𝑇
+𝑃
+𝑇
+𝑃
++
+𝐹
+𝑃
+Precision= 
+TP+FP
+TP
+​
+ 
+Recall: Ratio of true positives to total actual positives.
+Recall
+=
+𝑇
+𝑃
+𝑇
+𝑃
++
+𝐹
+𝑁
+Recall= 
+TP+FN
+TP
+​
+ 
+F1-score: Harmonic mean of precision and recall.
+F1
+=
+2
+×
+Precision
+×
+Recall
+Precision
++
+Recall
+F1=2× 
+Precision+Recall
+Precision×Recall
+​
+ 
+Explain Cross-Validation.
+A technique to assess model performance by splitting the data into training and validation sets multiple times, commonly using k-fold cross-validation.
+
+What is a Confusion Matrix?
+A matrix used to evaluate classification models by showing true positives (TP), true negatives (TN), false positives (FP), and false negatives (FN).
+
+Explain Bias and Variance Tradeoff.
+
+Bias: Error due to overly simplistic models.
+Variance: Error due to model complexity causing sensitivity to data fluctuations.
+A good model balances bias and variance.
+What is the ROC Curve and AUC?
+
+ROC Curve: Plots True Positive Rate (TPR) vs. False Positive Rate (FPR) at different thresholds.
+AUC (Area Under Curve): Measures the model's ability to distinguish between classes.
+Advanced Topics
+What is Gradient Descent?
+An optimization algorithm to minimize the loss function by updating the model's parameters iteratively in the direction of the negative gradient.
+
+Explain Feature Selection and Feature Extraction.
+
+Feature Selection: Selecting the most relevant features.
+Feature Extraction: Transforming data into new features (e.g., PCA).
+What is PCA (Principal Component Analysis)?
+PCA reduces dimensionality by projecting data onto principal components that explain the most variance.
+
+Difference between Bagging and Boosting.
+
+Bagging: Reduces variance by training multiple models independently (e.g., Random Forest).
+Boosting: Reduces bias by training models sequentially, correcting errors (e.g., AdaBoost, Gradient Boosting).
+How do you handle missing data?
+
+Remove missing values.
+Impute missing values using mean, median, or mode.
+Use advanced techniques like KNN imputation.
